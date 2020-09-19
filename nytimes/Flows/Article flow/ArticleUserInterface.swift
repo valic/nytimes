@@ -13,7 +13,7 @@ extension ArticleController {
     
     func setupUI() {
         title = self.viewModel.mainTabBarType.title
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = .systemBackground
         
         setupTableView()
     }

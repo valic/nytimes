@@ -35,6 +35,8 @@ extension ArticleController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard self.viewModel.mainTabBarType != .favorites else { return nil }
+        
         let article = viewModel.articles[indexPath.row]
 
         let deleteAction = UIContextualAction(style: .normal, title: "Favorite") { _, _, complete in

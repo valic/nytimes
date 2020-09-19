@@ -41,18 +41,9 @@ final class TabbarController: UITabBarController, UITabBarControllerDelegate {
             navigationController.tabBarItem = UITabBarItem(title: tabBarType.title, image: nil, selectedImage: nil)
             navigationController.tabBarItem.tag = tabBarType.rawValue
             
-            switch tabBarType {
-            case .favorites:
-                let vc = UIViewController()
-                vc.title = tabBarType.title
-                vc.view.backgroundColor = .white
-                navigationController.addChild(vc)
-                viewControllers.append(navigationController)
-            default:
-                let vc = ArticleController(viewModel: ArticleViewModel(mainTabBarType: tabBarType))
-                navigationController.addChild(vc)
-                viewControllers.append(navigationController)
-            }
+            let vc = ArticleController(viewModel: ArticleViewModel(mainTabBarType: tabBarType))
+            navigationController.addChild(vc)
+            viewControllers.append(navigationController)
         }
         
         self.viewControllers = viewControllers

@@ -56,8 +56,18 @@ class ArticleViewModel {
                     self.onErrorHandler?(error)
                 }
             }
-        default:
-            break
+        case .favorites:
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                    return
+            }
+            let managedContext = appDelegate.persistentContainer.viewContext
+            let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Article")
+            do {
+                let objecs = try managedContext.fetch(fetchRequest)
+                self.articles = objecs.map({$0 as! Article})
+            } catch let error as NSError {
+                self.onErrorHandler?(error)
+            }
         }
     }
 }
