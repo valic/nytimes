@@ -7,10 +7,11 @@
 
 import Foundation
 import Moya
+import CoreData
 
-public struct APINetworkManager {
+ struct APINetworkManager {
     
-    public init() {}
+     init() {}
        #if DEBUG
            let provider = MoyaProvider<API>(plugins: [NetworkLoggerPlugin(verbose: true)])
        #else
@@ -19,18 +20,26 @@ public struct APINetworkManager {
     
     fileprivate var decoder: JSONDecoder {
         let decoder = JSONDecoder()
-        //        decoder .dateDecodingStrategy = .iso8601
+        guard let codingUserInfoKeyManagedObjectContext = CodingUserInfoKey.managedObjectContext else {
+            fatalError("Failed to retrieve managed object context")
+        }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                return decoder
+        }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        decoder.userInfo[codingUserInfoKeyManagedObjectContext] = managedContext
         return decoder
     }
     
     // MARK: - Requests
     
-    public func emailed(completion: @escaping (_ r: ResponseA<Article>) -> Void) {
+     func emailed(completion: @escaping (_ r: ResponseA<Article>) -> Void) {
         provider.request(.emailed(period: 30)) { (result) in
             switch result {
             case .success(let response):
                 do {
-                    let articles = try self.decoder.decode(ArticleResult.self, from: response.data).results
+                    // Parse JSON data
+                    let articles = try decoder.decode(ArticleResult.self, from: response.data).results
                     completion(ResponseA.success(articles))
                 } catch let error {
                     print(error)
@@ -43,7 +52,7 @@ public struct APINetworkManager {
         }
     }
     
-    public func shared(completion: @escaping (_ r: ResponseA<Article>) -> Void) {
+     func shared(completion: @escaping (_ r: ResponseA<Article>) -> Void) {
         provider.request(.shared(period: 30)) { (result) in
             switch result {
             case .success(let response):
@@ -61,7 +70,7 @@ public struct APINetworkManager {
         }
     }
     
-    public func viewed(completion: @escaping (_ r: ResponseA<Article>) -> Void) {
+     func viewed(completion: @escaping (_ r: ResponseA<Article>) -> Void) {
         provider.request(.viewed(period: 30)) { (result) in
             switch result {
             case .success(let response):

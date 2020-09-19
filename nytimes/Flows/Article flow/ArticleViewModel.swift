@@ -7,7 +7,8 @@
 //
 
 import Foundation
-import API
+import CoreData
+import UIKit
 
 class ArticleViewModel {
     var onUpdateArticlesHandler: (() -> Void)?

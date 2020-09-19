@@ -26,11 +26,35 @@ extension ArticleController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let article = viewModel.articles[indexPath.row]
-        guard let url = URL(string: article.url) else { return }
+        guard let urlString = article.url,
+              let url = URL(string: urlString) else { return }
         let safariVC = SFSafariViewController(url: url)
         safariVC.delegate = self
         safariVC.modalPresentationStyle = .popover
         self.present(safariVC, animated: true, completion: nil)
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let article = viewModel.articles[indexPath.row]
+
+        let deleteAction = UIContextualAction(style: .normal, title: "Favorite") { _, _, complete in
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                    return
+            }
+            let managedContext = appDelegate.persistentContainer.viewContext
+            managedContext.insert(article)
+            do {
+                try managedContext.save()
+            } catch let error {
+                print(error)
+            }
+            
+            complete(true)
+        }
+        deleteAction.backgroundColor = .systemGreen
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        configuration.performsFirstActionWithFullSwipe = true
+        return configuration
     }
 }
 
